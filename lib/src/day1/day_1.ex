@@ -47,11 +47,12 @@ defmodule Aoc.Day1 do
 
   def times_over_zero(move_to, move_from) do
     # count number of clicks over 1 full rotations either right or left
-    clicks_over_full_rotation = case move_to do
-      number when number < 0 -> abs(number) + 100
-      number when number > 100 -> number
-      _ -> 0
-    end
+    clicks_over_full_rotation =
+      case move_to do
+        number when number < 0 -> abs(number) + 100
+        number when number > 100 -> number
+        _ -> 0
+      end
 
     final_position = move(move_to)
 
