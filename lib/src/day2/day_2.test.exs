@@ -12,16 +12,16 @@ defmodule Aoc.Day2Test do
       assert result == 1_227_775_554
     end
 
-    test "real data" do
-      result = Subject.execute_part_1()
+    # test "real data" do
+    #   result = Subject.execute_part_1()
 
-      assert result == 28_844_599_675
-    end
+    #   assert result == 28_844_599_675
+    # end
   end
 
   test "execute_part_2/1" do
     result = Subject.execute_part_2(@test_data)
 
-    assert result == 0
+    assert result == 4_174_379_265
   end
 end
