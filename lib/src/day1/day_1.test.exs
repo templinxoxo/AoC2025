@@ -76,6 +76,5 @@ defmodule Aoc.Day1Test do
     test "2: for move from 0 to 210   (over 2 full right rotations)" do
       assert Subject.times_over_zero(210, 10) == 2
     end
-
   end
 end
