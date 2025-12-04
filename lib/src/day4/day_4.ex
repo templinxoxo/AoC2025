@@ -7,19 +7,35 @@ defmodule Aoc.Day4 do
     data
     |> parse_input()
     |> get_paper_rolls_coordinates()
-    |> get_available_paper_rolls()
+    |> get_available_paper_rolls_coordinates()
     |> length()
   end
 
   def execute_part_2(data \\ fetch_data()) do
     data
     |> parse_input()
+    |> get_paper_rolls_coordinates()
+    |> remove_all_paper_rolls()
+    |> length()
+  end
 
-    0
+  def remove_all_paper_rolls([]) do
+    []
+  end
+
+  def remove_all_paper_rolls(paper_rolls_coordinates) do
+    case get_available_paper_rolls_coordinates(paper_rolls_coordinates) do
+      [] ->
+        []
+
+      rolls_removed_in_current_step ->
+        remove_all_paper_rolls(paper_rolls_coordinates -- rolls_removed_in_current_step) ++
+          rolls_removed_in_current_step
+    end
   end
 
   @max_nearby_rolls_count 4
-  def get_available_paper_rolls(paper_rolls_coordinates) do
+  def get_available_paper_rolls_coordinates(paper_rolls_coordinates) do
     paper_rolls_coordinates
     |> Enum.filter(fn coordinates ->
       coordinates
@@ -40,7 +56,9 @@ defmodule Aoc.Day4 do
     |> Kernel.--([{x, y}])
   end
 
-  defp get_paper_rolls_coordinates(data) do
+  use Memoize
+
+  defmemo get_paper_rolls_coordinates(data) do
     data
     |> Enum.with_index()
     |> Enum.flat_map(fn {row, y} ->
