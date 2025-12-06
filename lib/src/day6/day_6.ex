@@ -5,20 +5,20 @@ defmodule Aoc.Day6 do
   """
   def execute_part_1(data \\ fetch_data()) do
     data
-    |> parse_input()
+    |> parse_input_1()
     |> Enum.map(&solve/1)
     |> Enum.sum()
   end
 
   def execute_part_2(data \\ fetch_data()) do
     data
-    |> parse_input()
-
-    0
+    |> parse_input_2()
+    |> Enum.map(&solve/1)
+    |> Enum.sum()
   end
 
   def solve(task) do
-    {numbers, [operation | _]} = Enum.split_while(task, &is_integer/1)
+    {numbers, [operation]} = Enum.split_while(task, &is_integer/1)
 
     Enum.reduce(numbers, fn number, acc ->
       case operation do
@@ -34,7 +34,7 @@ defmodule Aoc.Day6 do
     Aoc.Utils.Api.get_input(day)
   end
 
-  def parse_input(input) do
+  def parse_input_1(input) do
     input
     |> String.split("\n", trim: true)
     |> Enum.map(fn row ->
@@ -44,7 +44,55 @@ defmodule Aoc.Day6 do
     |> Enum.map(&Tuple.to_list/1)
   end
 
+  def parse_input_2(input) do
+    rows = String.split(input, "\n", trim: true)
+    operations = List.last(rows)
+
+    ranges =
+      operations
+      |> String.split("")
+      |> Enum.with_index()
+      |> Enum.filter(fn {operation, _index} ->
+        operation in ["*", "+"]
+      end)
+      |> Enum.map(&elem(&1, 1))
+      |> Enum.chunk_every(2, 1)
+      |> Enum.map(fn
+        [from, to] -> {from - 1, to - 3}
+        [from] -> {from - 1, -1}
+      end)
+
+    rows
+    |> Enum.map(fn row ->
+      Enum.map(ranges, fn {from, to} ->
+        String.slice(row, from..to//1)
+      end)
+    end)
+    |> Enum.zip()
+    |> Enum.map(&Tuple.to_list/1)
+    |> Enum.map(fn row ->
+      operation = List.last(row) |> String.trim() |> parse()
+
+      Enum.slice(row, 0..-2//1)
+      |> transform()
+      |> Enum.concat([operation])
+    end)
+  end
+
   def parse("*"), do: :multiply
   def parse("+"), do: :add
   def parse(number), do: String.to_integer(number)
+
+  def transform(numbers) do
+    iterations = numbers |> Enum.map(&String.length/1) |> Enum.max()
+
+    1..iterations
+    |> Enum.map(fn i ->
+      numbers
+      |> Enum.map(&String.at(&1, -i))
+      |> Enum.reject(&(&1 == " "))
+      |> Enum.join("")
+      |> String.to_integer()
+    end)
+  end
 end
