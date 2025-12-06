@@ -49,32 +49,41 @@ defmodule Aoc.Day6 do
     operations = List.last(rows)
 
     ranges =
+      # looking at the operations row
       operations
       |> String.split("")
+      # find indices where each column with operation/numbers start
       |> Enum.with_index()
       |> Enum.filter(fn {operation, _index} ->
         operation in ["*", "+"]
       end)
       |> Enum.map(&elem(&1, 1))
+      # map to column ranges
       |> Enum.chunk_every(2, 1)
       |> Enum.map(fn
         [from, to] -> {from - 1, to - 3}
         [from] -> {from - 1, -1}
       end)
 
+      # then for each row
     rows
     |> Enum.map(fn row ->
+      # split into columns by calculated ranges
       Enum.map(ranges, fn {from, to} ->
         String.slice(row, from..to//1)
       end)
     end)
+    # zip to get columns in rows
     |> Enum.zip()
     |> Enum.map(&Tuple.to_list/1)
     |> Enum.map(fn row ->
+      # clean up operations to atom value
       operation = List.last(row) |> String.trim() |> parse()
 
+      # for numbers, transform based on cephalopod logic
       Enum.slice(row, 0..-2//1)
       |> transform()
+      # concat operation to the end
       |> Enum.concat([operation])
     end)
   end
