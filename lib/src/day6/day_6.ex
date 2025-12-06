@@ -6,8 +6,8 @@ defmodule Aoc.Day6 do
   def execute_part_1(data \\ fetch_data()) do
     data
     |> parse_input()
-
-    0
+    |> Enum.map(&solve/1)
+    |> Enum.sum()
   end
 
   def execute_part_2(data \\ fetch_data()) do
@@ -15,6 +15,17 @@ defmodule Aoc.Day6 do
     |> parse_input()
 
     0
+  end
+
+  def solve(task) do
+    {numbers, [operation | _]} = Enum.split_while(task, &is_integer/1)
+
+    Enum.reduce(numbers, fn number, acc ->
+      case operation do
+        :multiply -> acc * number
+        :add -> acc + number
+      end
+    end)
   end
 
   # helpers
@@ -27,7 +38,13 @@ defmodule Aoc.Day6 do
     input
     |> String.split("\n", trim: true)
     |> Enum.map(fn row ->
-      row
+      row |> String.split(" ", trim: true) |> Enum.reject(&(&1 == "")) |> Enum.map(&parse/1)
     end)
+    |> Enum.zip()
+    |> Enum.map(&Tuple.to_list/1)
   end
+
+  def parse("*"), do: :multiply
+  def parse("+"), do: :add
+  def parse(number), do: String.to_integer(number)
 end
